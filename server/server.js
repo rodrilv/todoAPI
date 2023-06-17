@@ -1,8 +1,8 @@
 import express, { json, urlencoded } from "express";
 import { db } from "./config/mongoose.js";
-import * as config from "./config/config.js";
 import { Todo } from "./models/todo.js";
 import { User } from "./models/user.js";
+import * as config from "./config/config.js";
 
 config; //Brings the configuration code to this context.
 
@@ -22,7 +22,7 @@ app.use((req, res, next) => {
 });
 
 app.listen(3000, () => {
-  console.log("Escuchando por el puerto", 3000);
+  console.log("Listening on Port:", 3000);
   db();
 });
 
@@ -51,7 +51,6 @@ app.post("/createTodo", async (req, res) => {
 app.get("/getTodos/:id", async (req, res) => {
   try {
     const nameParam = req.params["id"];
-    console.log(nameParam);
     const todos = await Todo.find({ user_id: nameParam }).exec();
     return res.status(200).json({
       ok: true,
@@ -65,7 +64,30 @@ app.get("/getTodos/:id", async (req, res) => {
   }
 });
 
-app.delete("/deleteTodo", async (req, res) => {
+app.get("/getTodosByPriority/:id/:priority", async (req, res) => {
+  try {
+    const priority = req.params["priority"];
+    const id = req.params["id"];
+    const todos = await Todo.find({ user_id: id, priority: priority });
+    if (!todos) {
+      return res.status(404).json({
+        ok: false,
+        error: "Not Found (404)",
+      });
+    }
+    return res.status(200).json({
+      ok: true,
+      todos,
+    });
+  } catch (error) {
+    return res.status(404).json({
+      ok: false,
+      error: "Not Found (404)",
+    });
+  }
+});
+
+app.post("/deleteTodo", async (req, res) => {
   try {
     const id = req.body["id"];
     await Todo.deleteOne({ _id: id });
@@ -92,7 +114,7 @@ app.put("/updateTodo", async (req, res) => {
         priority: body["priority"],
       }
     );
-    return res.status(200).json({
+    return res.status(201).json({
       ok: true,
     });
   } catch (error) {
@@ -111,16 +133,15 @@ app.post("/login", async (req, res) => {
       password: body["password"],
     }).exec();
     if (!user) {
-      return res.status(400).json({
+      return res.status(404).json({
         ok: false,
-        error,
-      });
-    } else {
-      return res.status(200).json({
-        ok: true,
-        user,
+        error: "Not Found (404)",
       });
     }
+    return res.status(200).json({
+      ok: true,
+      user,
+    });
   } catch (error) {
     return res.status(400).json({
       ok: false,
