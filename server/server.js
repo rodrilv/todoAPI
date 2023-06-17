@@ -34,7 +34,7 @@ app.post("/createTodo", async (req, res) => {
       content: body["content"],
       date: body["date"],
       priority: body["priority"],
-      username: body["username"],
+      user_id: body["user_id"],
     });
     await todo.save();
     return res.status(200).json({
@@ -48,10 +48,11 @@ app.post("/createTodo", async (req, res) => {
   }
 });
 
-app.get("/getTodos/:name", async (req, res) => {
+app.get("/getTodos/:id", async (req, res) => {
   try {
-    const nameParam = req.params["name"];
-    const todos = await Todo.find({ username: nameParam }).exec();
+    const nameParam = req.params["id"];
+    console.log(nameParam);
+    const todos = await Todo.find({ user_id: nameParam }).exec();
     return res.status(200).json({
       ok: true,
       todos,
@@ -83,7 +84,7 @@ app.put("/updateTodo", async (req, res) => {
   try {
     const body = req.body;
     await Todo.findOneAndUpdate(
-      { _id: body["_id"] },
+      { _id: body["_id"], user_id: body["user_id"] },
       {
         title: body["title"],
         content: body["content"],

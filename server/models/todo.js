@@ -8,7 +8,7 @@ const todoSchema = new Schema({
   content: { type: String },
   date: { type: String },
   priority: { type: String },
-  username: { type: String },
+  user_id: { type: String },
 });
 
 todoSchema.plugin(uniqueValidator, {
