@@ -8,6 +8,7 @@ const todoSchema = new Schema({
   content: { type: String },
   date: { type: String },
   priority: { type: String },
+  status: { type: String },
   user_id: { type: String },
 });
 

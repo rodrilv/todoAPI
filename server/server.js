@@ -35,6 +35,7 @@ app.post("/createTodo", async (req, res) => {
       date: body["date"],
       priority: body["priority"],
       user_id: body["user_id"],
+      status: "Pendiente",
     });
     await todo.save();
     return res.status(200).json({
@@ -51,7 +52,9 @@ app.post("/createTodo", async (req, res) => {
 app.get("/getTodos/:id", async (req, res) => {
   try {
     const nameParam = req.params["id"];
-    const todos = await Todo.find({ user_id: nameParam }).exec();
+    const todos = await Todo.find({ user_id: nameParam })
+      .sort({ date: "desc" })
+      .exec();
     return res.status(200).json({
       ok: true,
       todos,
@@ -68,7 +71,9 @@ app.get("/getTodosByPriority/:id/:priority", async (req, res) => {
   try {
     const priority = req.params["priority"];
     const id = req.params["id"];
-    const todos = await Todo.find({ user_id: id, priority: priority });
+    const todos = await Todo.find({ user_id: id, priority: priority }).sort({
+      date: "desc",
+    });
     if (!todos) {
       return res.status(404).json({
         ok: false,
@@ -112,6 +117,27 @@ app.put("/updateTodo", async (req, res) => {
         content: body["content"],
         date: body["date"],
         priority: body["priority"],
+      }
+    );
+    return res.status(201).json({
+      ok: true,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      ok: false,
+      error,
+    });
+  }
+});
+
+app.put("/completeTodo/:id", async (req, res) => {
+  try {
+    const id = req.params["id"];
+    const body = req.body;
+    await Todo.findOneAndUpdate(
+      { _id: id, user_id: body["user_id"] },
+      {
+        status: body["status"],
       }
     );
     return res.status(201).json({
