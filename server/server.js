@@ -92,6 +92,31 @@ app.get("/getTodosByPriority/:id/:priority", async (req, res) => {
   }
 });
 
+app.get("/getTodosByStatus/:id/:status", async (req, res) => {
+  try {
+    const status = req.params["status"];
+    const id = req.params["id"];
+    const todos = await Todo.find({ user_id: id, status: status }).sort({
+      date: "desc",
+    });
+    if (!todos) {
+      return res.status(404).json({
+        ok: false,
+        error: "Not Found (404)",
+      });
+    }
+    return res.status(200).json({
+      ok: true,
+      todos,
+    });
+  } catch (error) {
+    return res.status(404).json({
+      ok: false,
+      error: "Not Found (404)",
+    });
+  }
+});
+
 app.post("/deleteTodo", async (req, res) => {
   try {
     const id = req.body["id"];
