@@ -12,3 +12,7 @@ This project was made by me (rodrilv), feel free to use it as example ONLY!
 You will need your own .env file with your Mongo database URL:
 
 - `DEV_DB`
+
+Install its dependencies by running:
+
+- `npm ci`
